@@ -40,7 +40,7 @@ for cfg_file in ${(@)cfg_files}; do
   fi
 
   if [[ ! -f $XDG_CONFIG_HOME/$cfg_file ]]; then
-    ln -s $cfg_src/$file $XDG_CONFIG_HOME/$cfg_file
+    ln -s $cfg_src/$cfg_file $XDG_CONFIG_HOME/$cfg_file
   fi
 done
 
