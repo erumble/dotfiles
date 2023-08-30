@@ -1,9 +1,6 @@
 #
 # Sets Prezto options.
 #
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
 
 #
 # General
@@ -34,6 +31,7 @@ zstyle ':prezto:*:*' color 'yes'
 # 'completion' must be after 'utility'
 # 'history-substring-search' must be after 'syntax-highlighting'
 # 'autosuggestions' must be after 'history-substring-search'
+# 'syntax-highlighting' must be loaded last
 
 zstyle ':prezto:load' pmodule \
   'environment' \
@@ -42,7 +40,6 @@ zstyle ':prezto:load' pmodule \
   'editor' \
   'git' \
   'history' \
-  'syntax-highlighting' \
   'history-substring-search' \
   'autosuggestions' \
   'prompt' \
@@ -50,7 +47,8 @@ zstyle ':prezto:load' pmodule \
   'spectrum' \
   'terminal' \
   'utility' \
-  'completion'
+  'completion' \
+  'syntax-highlighting'
 
 #
 # Autosuggestions
@@ -86,6 +84,7 @@ zstyle ':prezto:module:editor' key-bindings 'emacs'
 
 # Ignore submodules when they are 'dirty', 'untracked', 'all', or 'none'.
 # zstyle ':prezto:module:git:status:ignore' submodules 'all'
+zstyle ':prezto:module:git:alias' skip 'yes'
 zstyle ':prezto:module:git:info:branch' format 'branch%b'
 zstyle ':prezto:module:git:info:keys' format 'prompt' ' git(%b)'
 
@@ -170,6 +169,7 @@ zstyle ':prezto:module:prompt' theme 'sorin'
 
 # Auto switch the Ruby version on directory change.
 # zstyle ':prezto:module:ruby:chruby' auto-switch 'yes'
+zstyle ':prezto:module:ruby:alias' skip 'yes'
 
 #
 # Screen
