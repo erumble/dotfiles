@@ -2,6 +2,12 @@
 
 set -x
 
+# Install Homebrew
+if [[ ! -f /opt/homebrew/bin/brew ]]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+brew bundle
+
 # Set XDG vars (these will be set by $HOME/.zshenv after this is run for the first time)
 cfg_src=${0:a:h}/config
 source $cfg_src/zsh/.zshenv
