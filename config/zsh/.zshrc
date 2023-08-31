@@ -39,6 +39,17 @@ if [ $commands[kubectl] ]; then
   source <(kubectl completion zsh);
 fi
 
+# setup gcloud autocompletion
+if command -v gcloud &>/dev/null; then
+  source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+  source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+fi
+
+# setup ngrok autocompletion
+if command -v ngrok &>/dev/null; then
+  eval "$(ngrok completion)"
+fi
+
 # Aliases for non-native tools
 declare -A extAliases
 extAliases=(
