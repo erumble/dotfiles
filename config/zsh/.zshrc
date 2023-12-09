@@ -63,7 +63,7 @@ extAliases=(
   [rg]="rg --hidden -g '!.git' -g '!.terraform'"
   [tf]="terraform"
   [tfdocs]="terraform-docs"
-  [tree]="tree -I vendor -I .git -a"
+  [tree]="tree -I vendor -I .terraform -I .git -a"
   [vi]="nvim"
 )
 
