@@ -18,3 +18,5 @@
   trustExitCode = true
 [mergetool]
   prompt = false
+[gpg]
+  format = ssh
