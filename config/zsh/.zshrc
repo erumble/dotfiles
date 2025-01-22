@@ -51,7 +51,7 @@ if command -v ngrok &>/dev/null; then
 fi
 
 # Make "kubecolor" borrow the same completion logic as "kubectl"
-if command -v  kubecolor &>/dev/null; then
+if command -v kubecolor &>/dev/null; then
   compdef kubecolor=kubectl
 fi
 
