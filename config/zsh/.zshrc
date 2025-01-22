@@ -50,20 +50,26 @@ if command -v ngrok &>/dev/null; then
   eval "$(ngrok completion)"
 fi
 
+# Make "kubecolor" borrow the same completion logic as "kubectl"
+if command -v  kubecolor &>/dev/null; then
+  compdef kubecolor=kubectl
+fi
+
 # Aliases for non-native tools
 declare -A extAliases
 extAliases=(
-  [ag]="ag --hidden --ignore .git/ --ignore .terraform/"
   [cat]="bat"
   [cdiff]="colordiff -u"
-  [kc]="kubectl"
+  [kc]="kubecolor"
   [kctx]="kubectx"
   [kcns]="kubens"
-  [ll]="eza -aghl --color-scale --git"
+  [kcq]="cyphernetes query"
+  [ll]="eza -aghl --color-scale --git --group-directories-first"
   [rg]="rg --hidden -g '!.git' -g '!.terraform'"
   [tf]="terraform"
+  [tg]="terragrunt"
   [tfdocs]="terraform-docs"
-  [tree]="tree -I vendor -I .terraform -I .git -a"
+  [tree]="tree -I vendor -I .terraform -I .git -a --dirsfirst"
   [vi]="nvim"
 )
 
