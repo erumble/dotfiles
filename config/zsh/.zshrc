@@ -69,7 +69,9 @@ extAliases=(
   [tf]="terraform"
   [tg]="terragrunt"
   [tfdocs]="terraform-docs"
-  [tree]="tree -I vendor -I .terraform -I .git -a --dirsfirst"
+  [tree]="tree -I vendor -I .terraform -I .terragrunt-cache -I .git -a --dirsfirst"
+  [urldecode]='python3 -c "import sys, urllib.parse as ul; print(ul.unquote_plus(sys.argv[1]))"'
+  [urlencode]='python3 -c "import sys, urllib.parse as ul; print (ul.quote_plus(sys.argv[1]))"'
   [vi]="nvim"
 )
 
