@@ -5,6 +5,8 @@
 [alias]
   alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
   change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f"
+  cleanup = ! git switch $(git rev-parse --abbrev-ref origin/HEAD | cut -c8-) && git pull && (git branch -d $(git branch --format '%(refname:short)' | grep -Ev 'master|main') || true) && git remote prune origin
+  hard-reset = reset HEAD --hard
   main = ! git switch $(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
   new = switch -c
   poke = commit --allow-empty -m 'poke'
