@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+# Install Xcode Command Line Tools (Homebrew and git depend on them). The
+# installer is a GUI popup that runs async, so wait for it before continuing.
+if ! xcode-select -p &>/dev/null; then
+  xcode-select --install
+  until xcode-select -p &>/dev/null; do sleep 5; done
+fi
+
 # Install Homebrew
 if [[ ! -f /opt/homebrew/bin/brew ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -48,4 +55,32 @@ for file in ${cfg_src}/**/^README.md(.ND); do
   for dir in $link_dirs; do [[ $file == $dir/* ]] && continue 2; done
   link $file $XDG_CONFIG_HOME/${file#$cfg_src/}
 done
+
+# macOS system setup. Each step is guarded so re-running is a no-op.
+
+# Touch ID for sudo. sudo_local is a user file that survives OS updates, unlike
+# editing /etc/pam.d/sudo directly (which macOS clobbers on every upgrade).
+# pam_reattach must precede pam_tid so Touch ID also works inside tmux.
+if [[ -f /etc/pam.d/sudo_local.template && ! -f /etc/pam.d/sudo_local ]]; then
+  print "enabling Touch ID for sudo (tmux-aware)"
+  sudo tee /etc/pam.d/sudo_local >/dev/null <<'EOF'
+auth       optional       /opt/homebrew/lib/pam/pam_reattach.so
+auth       sufficient     pam_tid.so
+EOF
+fi
+
+# Application firewall. Setting it on when already on is harmless, but guard to
+# avoid a needless sudo prompt.
+if [[ $(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate) != *enabled* ]]; then
+  print "enabling application firewall"
+  sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on >/dev/null
+fi
+
+# Automatic security update checks.
+sudo softwareupdate --schedule on >/dev/null
+
+# FileVault requires a reboot and a recovery key, so don't force it — just warn.
+if ! fdesetup status | grep -q "FileVault is On"; then
+  print "WARNING: FileVault is off. Enable it: sudo fdesetup enable"
+fi
 
