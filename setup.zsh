@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-set -x
-
 # Install Homebrew
 if [[ ! -f /opt/homebrew/bin/brew ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -33,6 +31,7 @@ link() {  # link <source> <target>; never clobbers an existing path
   [[ -e $dst || -L $dst ]] && return
   mkdir -p ${dst:h}
   ln -s $src $dst
+  print "linked ${dst/#$HOME/~} -> ${src/#$HOME/~}"
 }
 
 # 1. Whole-directory links: dirs marked with a .symlink file (:h -> the dir).
