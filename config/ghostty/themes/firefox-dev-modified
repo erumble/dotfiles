@@ -1,0 +1,29 @@
+# Firefox Dev Modified
+
+background = #101416
+foreground = #8ea1b3
+
+cursor-color = #838e96
+cursor-text = #003441
+
+selection-background = #1b4e74
+selection-foreground = #f5f7fa
+
+palette = 0=#003441
+palette = 1=#ed5165
+palette = 2=#6ec14c
+palette = 3=#b58801
+palette = 4=#40aee5
+palette = 5=#e17bff
+palette = 6=#5c87b2
+palette = 7=#e3e3e3
+
+palette = 8=#414b4b
+palette = 9=#e92550
+palette = 10=#1b9d00
+palette = 11=#d7a302
+palette = 12=#0084cc
+palette = 13=#b433e1
+palette = 14=#006ca5
+palette = 15=#e8e8e8
+

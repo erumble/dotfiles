@@ -1,0 +1,46 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+
+case "${1:-}" in
+  clone)
+    shift
+
+    [[ $# -eq 1 ]] || {
+      print -u2 "Usage: gh r clone <owner/repo>"
+      exit 1
+    }
+
+    REPO="$1"
+    NAME=$(basename "$REPO")
+
+    mkdir -p "$NAME"
+
+    gh repo clone "$REPO" "$NAME/$NAME.git" -- --bare --single-branch
+
+    echo "gitdir: $NAME.git" > "$NAME/.git"
+
+    git --git-dir="$NAME/$NAME.git" \
+      config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+    git --git-dir="$NAME/$NAME.git" fetch origin
+    git --git-dir="$NAME/$NAME.git" remote set-head origin --auto
+
+    DEFAULT=$(git --git-dir="$NAME/$NAME.git" \
+      symbolic-ref --short refs/remotes/origin/HEAD)
+    DEFAULT="${DEFAULT#origin/}"
+
+    git -C "$NAME" worktree add \
+      --track \
+      -B "$DEFAULT" \
+      "$DEFAULT" \
+      "refs/remotes/origin/$DEFAULT"
+
+    echo "Ready: $NAME (bare repo, '$DEFAULT' checked out at $NAME/$DEFAULT)"
+    ;;
+
+  *)
+    exec gh repo "$@"
+    ;;
+esac
+
