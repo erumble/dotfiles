@@ -12,12 +12,6 @@ brew bundle
 cfg_src=${0:a:h}/config
 source $cfg_src/zsh/.zshenv
 
-# Install Prezto
-prezto_dir=$XDG_CONFIG_HOME/zsh/.zprezto
-if [[ ! -d $prezto_dir ]]; then
-  git clone --recursive https://github.com/sorin-ionescu/prezto.git $prezto_dir
-fi
-
 # ZDOTDIR needs to get set before zsh will respect $XDG_CONFIG_HOME/zsh
 if [[ ! -f $HOME/.zshenv ]]; then
   ln -s $cfg_src/zsh/.zshenv $HOME/.zshenv
@@ -35,18 +29,33 @@ if [[ ! -f $vimplug_autoload_dir/plug.vim ]]; then
   ln -s $vimplug_dir/plug.vim $vimplug_autoload_dir/plug.vim
 fi
 
-# Symlink config files
+# Symlink config into $XDG_CONFIG_HOME.
+#
+# A directory containing a `.symlink` marker is linked as a single unit, so new
+# files inside it appear automatically (handy for your own script dirs like
+# bin/). Everything else is linked file-by-file, which keeps tool-written state
+# (gh tokens, caches, lockfiles) out of this repo.
 setopt EXTENDED_GLOB
-cfg_files=(${cfg_src}/**/^README.md(.ND))
-cfg_files=(${(@)cfg_files#$cfg_src/})
 
-for cfg_file in ${(@)cfg_files}; do
-  if [[ ! -d $(dirname $XDG_CONFIG_HOME/$cfg_file) ]]; then
-    mkdir -p $(dirname $XDG_CONFIG_HOME/$cfg_file)
-  fi
+link() {  # link <source> <target>; never clobbers an existing path
+  local src=$1 dst=$2
+  [[ -e $dst || -L $dst ]] && return
+  mkdir -p ${dst:h}
+  ln -s $src $dst
+}
 
-  if [[ ! -f $XDG_CONFIG_HOME/$cfg_file ]]; then
-    ln -s $cfg_src/$cfg_file $XDG_CONFIG_HOME/$cfg_file
-  fi
+# 1. Whole-directory links: dirs marked with a .symlink file (:h -> the dir).
+typeset -a link_dirs
+link_dirs=(${cfg_src}/**/.symlink(N:h))
+for dir in $link_dirs; do
+  link $dir $XDG_CONFIG_HOME/${dir#$cfg_src/}
+done
+
+# 2. Everything else, file-by-file — skipping READMEs, markers, and anything
+#    already inside a marked directory.
+for file in ${cfg_src}/**/^README.md(.ND); do
+  [[ ${file:t} == .symlink ]] && continue
+  for dir in $link_dirs; do [[ $file == $dir/* ]] && continue 2; done
+  link $file $XDG_CONFIG_HOME/${file#$cfg_src/}
 done
 
