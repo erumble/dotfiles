@@ -2,10 +2,51 @@
 # Executes commands at the start of an interactive session.
 #
 
-# Source Prezto.
-if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
-fi
+# ---------------------------------------------------------------------------
+# History
+# ---------------------------------------------------------------------------
+HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history"
+HISTSIZE=10000
+SAVEHIST=10000
+[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
+
+setopt EXTENDED_HISTORY        # record command start time
+setopt SHARE_HISTORY           # share history between sessions
+setopt INC_APPEND_HISTORY      # append as commands are entered
+setopt HIST_IGNORE_ALL_DUPS    # drop older duplicates
+setopt HIST_IGNORE_SPACE       # skip commands starting with a space
+setopt HIST_REDUCE_BLANKS      # trim superfluous blanks
+setopt HIST_VERIFY             # don't run history expansions immediately
+
+# ---------------------------------------------------------------------------
+# Directory navigation
+# ---------------------------------------------------------------------------
+setopt AUTO_CD                 # `cd` into a dir by typing its name
+setopt AUTO_PUSHD              # maintain a dir stack on cd
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+
+# ---------------------------------------------------------------------------
+# Completion
+# ---------------------------------------------------------------------------
+autoload -Uz compinit
+_zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+[[ -d "${_zcompdump:h}" ]] || mkdir -p "${_zcompdump:h}"
+compinit -d "$_zcompdump"
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
+zstyle ':completion:*' rehash true
+
+# ---------------------------------------------------------------------------
+# Keybindings (emacs)
+# ---------------------------------------------------------------------------
+bindkey -e
+bindkey '^[[H'    beginning-of-line
+bindkey '^[[F'    end-of-line
+bindkey '^[[3~'   delete-char
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
 
 # Color ls
 export CLICOLOR=1
@@ -82,4 +123,31 @@ for key value in ${(kv)extAliases}; do
     alias $key=$value
   fi
 done
+
+# ---------------------------------------------------------------------------
+# Plugins (installed via Homebrew)
+# ---------------------------------------------------------------------------
+if command -v brew &>/dev/null; then
+  _brew_prefix="$(brew --prefix)"
+
+  # fish-like autosuggestions
+  source "$_brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
+
+  # command syntax highlighting (source before history-substring-search)
+  source "$_brew_prefix/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" 2>/dev/null
+
+  # up/down substring search (must be sourced last)
+  source "$_brew_prefix/share/zsh-history-substring-search/zsh-history-substring-search.zsh" 2>/dev/null
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+
+  unset _brew_prefix
+fi
+
+# ---------------------------------------------------------------------------
+# Prompt
+# ---------------------------------------------------------------------------
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+fi
 
