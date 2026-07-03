@@ -17,17 +17,8 @@ if [[ ! -f $HOME/.zshenv ]]; then
   ln -s $cfg_src/zsh/.zshenv $HOME/.zshenv
 fi
 
-# Install Vim Plug
-vimplug_dir=$XDG_CONFIG_HOME/nvim/.vim-plug
-if [[ ! -d $vimplug_dir ]]; then
-  git clone https://github.com/junegunn/vim-plug.git $vimplug_dir
-fi
-
-vimplug_autoload_dir=$XDG_DATA_HOME/nvim/site/autoload
-if [[ ! -f $vimplug_autoload_dir/plug.vim ]]; then
-  mkdir -p $vimplug_autoload_dir
-  ln -s $vimplug_dir/plug.vim $vimplug_autoload_dir/plug.vim
-fi
+# Neovim's plugin manager (lazy.nvim) self-bootstraps on first launch, and mason
+# installs language servers on demand, so there's nothing to install here.
 
 # Symlink config into $XDG_CONFIG_HOME.
 #
