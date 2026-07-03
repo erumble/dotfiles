@@ -11,6 +11,7 @@
   new = switch -c
   poke = commit --allow-empty -m 'poke'
   rpo = remote prune origin
+  wt = "!$HOME/.config/git/bin/git-wt"
 [diff]
   tool = Kaleidoscope
 [difftool "Kaleidoscope"]

@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+
+if [[ "$1" == "add" ]]; then
+  if [[ $# -lt 2 ]]; then
+    print -u2 "Usage: git wt add <branch>"
+    exit 1
+  fi
+
+  git worktree add "worktrees/$2" -b "$2"
+else
+  git worktree "$@"
+fi
+
