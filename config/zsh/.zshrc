@@ -34,9 +34,12 @@ _zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
 [[ -d "${_zcompdump:h}" ]] || mkdir -p "${_zcompdump:h}"
 compinit -d "$_zcompdump"
 
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
+zstyle ':completion:*' menu no                              # fzf-tab drives selection instead
+# case-insensitive, then word-boundary, then substring-anywhere matching
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' rehash true
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # ---------------------------------------------------------------------------
 # Keybindings (emacs)
@@ -107,6 +110,8 @@ extAliases=(
   [kcns]="kubens"
   [kcq]="cyphernetes query"
   [ll]="eza -aghl --color-scale --git --group-directories-first"
+  [pbc]="pbcopy"
+  [pbp]="pbpaste"
   [rg]="rg --hidden -g '!.git' -g '!.terraform'"
   [tf]="tofu"
   [tg]="terragrunt"
@@ -118,7 +123,7 @@ extAliases=(
 )
 
 for key value in ${(kv)extAliases}; do
-  cmd=$(awk '{print $1}' <<< $value)
+  cmd=${value%% *}
 
   if command -v $cmd &>/dev/null; then
     alias $key=$value
@@ -130,6 +135,11 @@ done
 # ---------------------------------------------------------------------------
 if command -v brew &>/dev/null; then
   _brew_prefix="$(brew --prefix)"
+
+  # fzf-driven completion menu (must load after compinit, before the widget-wrapping plugins below)
+  source "$_brew_prefix/share/fzf-tab/fzf-tab.zsh" 2>/dev/null
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+  zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
 
   # fish-like autosuggestions
   source "$_brew_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" 2>/dev/null
@@ -146,9 +156,22 @@ if command -v brew &>/dev/null; then
 fi
 
 # ---------------------------------------------------------------------------
+# fzf key bindings (Ctrl-R history, Ctrl-T files, Alt-C cd) + `**` completion
+# ---------------------------------------------------------------------------
+if command -v fzf &>/dev/null; then
+  source <(fzf --zsh)
+fi
+
+# ---------------------------------------------------------------------------
 # Prompt
 # ---------------------------------------------------------------------------
 if command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 fi
 
+# ---------------------------------------------------------------------------
+# zoxide — smarter `cd` (frecency jumps); must init at end of file
+# ---------------------------------------------------------------------------
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh --cmd cd)"
+fi
