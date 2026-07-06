@@ -1,3 +1,4 @@
+# vim: ft=gitconfig
 [commit]
   gpgsign = true
 [init]
@@ -27,3 +28,7 @@
   prompt = false
 [gpg]
   format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
+[includeIf "gitdir:~/src/"]
+  path = ~/src/git.gitconfig
