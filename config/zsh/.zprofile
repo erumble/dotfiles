@@ -6,8 +6,12 @@
 # Browser
 #
 
-if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
-  export BROWSER='open'
+if [[ -z "$BROWSER" ]]; then
+  if [[ "$OSTYPE" == darwin* ]]; then
+    export BROWSER='open'
+  elif [[ "$OSTYPE" == linux* ]]; then
+    export BROWSER='xdg-open'
+  fi
 fi
 
 #
@@ -48,6 +52,7 @@ typeset -gU cdpath fpath mailpath path
 path=(
   $HOME/{,s}bin(N)
   /opt/{homebrew,local}/{,s}bin(N)
+  /home/linuxbrew/.linuxbrew/{,s}bin(N)
   /usr/local/{,s}bin(N)
   /usr/local/go/bin(N)
   $path

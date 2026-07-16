@@ -56,10 +56,14 @@ bindkey '^[^['    kill-whole-line  # Esc-Esc clears the whole line (Ctrl-U also 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
-# setup brew if available
-if command -v /opt/homebrew/bin/brew &>/dev/null; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+# setup brew if available (macOS and Linux install locations)
+for _brew in /opt/homebrew/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+  if [[ -x $_brew ]]; then
+    eval "$($_brew shellenv)"
+    break
+  fi
+done
+unset _brew
 
 # setup pyenv if available
 if command -v pyenv &>/dev/null; then
@@ -129,6 +133,11 @@ for key value in ${(kv)extAliases}; do
     alias $key=$value
   fi
 done
+
+# Wayland stand-ins for the macOS clipboard aliases above
+if ! command -v pbcopy &>/dev/null && command -v wl-copy &>/dev/null; then
+  alias pbc="wl-copy" pbp="wl-paste"
+fi
 
 # ---------------------------------------------------------------------------
 # Plugins (installed via Homebrew)
